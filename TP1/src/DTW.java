@@ -76,11 +76,11 @@ public class DTW {
 	}
 	
 	private Point2D centroid(Vector<Point2D> points) {
-		Point2D centroid = new Point2D(0, 0);
-		for(Point2D p : points) {
-			centroid = centroid.add(p);
-		}
-		centroid = centroid.multiply(1.0 / points.size());
+		Point2D centroid = new Point2D(0.5, 0.5);
+//		for(Point2D p : points) {
+//			centroid = centroid.add(p);
+//		}
+//		centroid = centroid.multiply(1.0 / points.size());
 		return centroid;
 	}
 	
