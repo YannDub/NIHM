@@ -28,7 +28,7 @@ float mapX(float x) {
 }
 
 float mapY(float y) {
- return map(y, minY, maxY, 0, 800);
+ return map(y, maxY, minY, 0, 800);
 }
 
 void readData() {
