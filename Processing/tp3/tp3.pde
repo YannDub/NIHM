@@ -41,6 +41,15 @@ void draw(){
     if(cities[i].population > minPopulationToDisplay) cities[i].draw();
 }
 
+void keyPressed() {
+ if(key == '+') {
+   minPopulationToDisplay *= 2;
+ } else if(key == '-') {
+   minPopulationToDisplay /= 2;
+ }
+ redraw();
+}
+
 float mapX(float x) {
  return map(x, minX, maxX, 0, 800);
 }
