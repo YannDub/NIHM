@@ -38,7 +38,7 @@ public class HMM {
 	
 	
 	int cpt=0;
-	int resamplingPeriod = 20;
+	int resamplingPeriod = 200;
 	
 	HMM () {
 		gestureClasses = new Vector<String>();
