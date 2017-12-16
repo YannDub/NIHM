@@ -120,6 +120,14 @@ public class HMM {
 		for (int c=0; c<gestureClasses.size();c++) {
 			double scoreClass = classMap.get(gestureClasses.get(c)).computeScore(featuresRawPoints);
 			//System.out.println(gestureClasses.get(c) + " " + scoreClass);
+			
+			//Distance du premier et dernier points
+			Point2D p1 = resampledRawPoints.get(0);
+			Point2D p2 = resampledRawPoints.get(resampledRawPoints.size() - 1);
+			if(classMap.get(gestureClasses.get(c)).distanceValide(p1.distance(p2)))
+				scoreClass = 0;
+			//Fin distance
+			
 			gesturesProbabilities.add(new GestureProbability(gestureClasses.get(c), scoreClass));
 			if (scoreClass > score) {
 				score = scoreClass;

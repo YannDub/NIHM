@@ -16,6 +16,7 @@ import be.ac.ulg.montefiore.run.jahmm.ObservationReal;
 import be.ac.ulg.montefiore.run.jahmm.OpdfIntegerFactory;
 import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchLearner;
 import be.ac.ulg.montefiore.run.jahmm.learn.KMeansLearner;
+import javafx.geometry.Point2D;
 
 
 public class GestureClass {
@@ -128,6 +129,16 @@ public class GestureClass {
 		ForwardBackwardCalculator c = new ForwardBackwardCalculator(obs, hmm);
 		res = c.probability();
 		return res;
-	}	
+	}
+	
+	public boolean distanceValide(double d) {
+		for(Template temp : this.examples) {
+			Point2D first = temp.getPoints().get(0).getPoint();
+			Point2D last = temp.getPoints().get(temp.getPoints().size() - 1).getPoint();
+			double dist = first.distance(last);
+			if(d * 0.5 < dist && d * 2 > dist) return true;
+		}
+		return false;
+	}
 	
 }	
