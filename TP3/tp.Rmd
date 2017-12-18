@@ -1,0 +1,144 @@
+---
+title: "TP R"
+author: "Yann Dubois"
+date: "2017"
+output: html_document
+---
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+```
+
+## Premier pas
+```{r}
+v = c(12, .4, 5, 2, 50, 8, 3, 1, 4, .25)
+quantile(v, prob = c(0.9))
+```
+
+## Graphique
+```{r}
+v = c(12, .4, 5, 2, 50, 8, 3, 1, 4, .25)
+u = c(10, .8, 2, 5, 33, 15, 5, 3, 8, .1)
+boxplot(v, u)
+barplot(v, u)
+```
+
+## Importation de données à partir de fichiers
+
+### Q3
+```{r readdata}
+data = read.table("data.txt", header=TRUE, sep=",")
+```
+
+```{r}
+meanTime = function(frame, technique) {
+  t = subset(frame, Technique==technique)
+  mean(t[, "Time"])
+}
+```
+
+### Q4
+```{r}
+techniques = unique(data$Technique)
+times = sapply(techniques, function(x)drop(meanTime(data, x)))
+```
+
+### Q5
+```{r}
+barplot(times, xlab = "Technique", ylab = "Time", names.arg = techniques)
+```
+
+### Q6
+```{r}
+dataWithoutError = subset(data, Err != 1)
+```
+
+### Q7
+```{r}
+library("gplots")
+library("gmodels")
+interval_confiance = function(technique) {
+  d = subset(dataWithoutError, Technique==technique)
+  ci(d[, "Time"])
+}
+res = sapply(techniques, function(x)drop(interval_confiance(x)))
+```
+
+### Q8
+```{r}
+lower = res["CI lower",]
+upper = res["CI upper",]
+times = sapply(techniques, function(x)drop(meanTime(dataWithoutError, x)))
+barplot2(times, names.arg = techniques, plot.ci = TRUE, ci.l = lower, ci.u = upper)
+```
+
+## ANOVA
+
+```{r}
+library("reshape")
+library("ez")
+
+# Chargement des donnees
+data = read.table("data.txt", header=TRUE, sep=",")
+
+# On ne garde que ce qui nous interesse
+filteredData = subset(data, (Err==0), select = c(Participant, Block, Technique,
+                      A, W, density, Time))
+
+# Aggregation des donnees pour ne conserver qu’une valeur par condition
+attach(filteredData)
+aggdata = aggregate(filteredData$Time, by=list(Participant,Block,Technique,W, density),
+                    FUN=mean)
+detach(filteredData)
+
+# Reecriture des noms de colonnes
+colnames(aggdata) = c("Participant","Block","Technique","W", "density", "Time")
+
+# Conversion des donnees au format long
+data.long = melt(aggdata, id = c("Participant","Block","Technique","W","density","Time"))
+
+# On specifie les variables independantes
+data.long$Block = factor(data.long$Block)
+data.long$Technique = factor(data.long$Technique)
+data.long$W = factor(data.long$W)
+data.long$density = factor(data.long$density)
+
+# L’ANOVA:
+print(ezANOVA(data.long, dv=.(Time), wid=.(Participant), within=.(Technique,W,density)))
+
+# Analyse post-hoc avec ajustement de Bonferroni
+attach(data.long)
+print(pairwise.t.test(Time, interaction(Technique), p.adj = "bonf"))
+print(pairwise.t.test(Time, interaction(Technique, density), p.adj = "bonf"))
+detach(data.long)
+```
+
+## Q9
+
+Non, m'effet significatif technique ne permet de conclure que Surfpad est meilleure que les deux autres techniques. Pour pouvoir conclure, il faut étudier l'intéraction entre les périphériques et les blocs. En effet on peut voir un effet significatif sur les blocs sans pouvoir conclure sur l'effet d'apprentissage.
+
+## Q10
+
+```{r}
+meanTimeDensity = function(data, techniques, density) {
+  newData = subset(data, density=density)
+  sapply(techniques, meanTime, data=newData)
+}
+
+densities = unique(filteredData$density)
+densities
+res = sapply(densities, meanTimeDensity, techniques=techniques, data=filteredData)
+
+#densities = unique(filteredData[,"density"])
+#res = sapply(techniques, function(x)drop(interval_confiance(x)))
+#lower = res["CI lower",]
+#upper = res["CI upper",]
+#times = sapply(techniques, function(x)drop(meanTime(filteredData, x)))
+#barplot2(times, names.arg = densities, plot.ci = TRUE, ci.l = lower, ci.u = upper)
+```
