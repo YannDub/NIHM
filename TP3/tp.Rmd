@@ -119,26 +119,19 @@ print(pairwise.t.test(Time, interaction(Technique, density), p.adj = "bonf"))
 detach(data.long)
 ```
 
-## Q9
+### Q9
 
 Non, m'effet significatif technique ne permet de conclure que Surfpad est meilleure que les deux autres techniques. Pour pouvoir conclure, il faut étudier l'intéraction entre les périphériques et les blocs. En effet on peut voir un effet significatif sur les blocs sans pouvoir conclure sur l'effet d'apprentissage.
 
-## Q10
+### Q10
 
 ```{r}
-meanTimeDensity = function(data, techniques, density) {
-  newData = subset(data, density=density)
-  sapply(techniques, meanTime, data=newData)
+meanTimeDensity = function(frame, densities, techniques) {
+  newData = subset(frame, density=density)
+  sapply(techniques, meanTime, frame=newData)
 }
 
 densities = unique(filteredData$density)
-densities
-res = sapply(densities, meanTimeDensity, techniques=techniques, data=filteredData)
-
-#densities = unique(filteredData[,"density"])
-#res = sapply(techniques, function(x)drop(interval_confiance(x)))
-#lower = res["CI lower",]
-#upper = res["CI upper",]
-#times = sapply(techniques, function(x)drop(meanTime(filteredData, x)))
-#barplot2(times, names.arg = densities, plot.ci = TRUE, ci.l = lower, ci.u = upper)
+res = sapply(densities, meanTimeDensity, frame=filteredData, techniques=techniques)
+barplot2(res, names.arg = densities, beside=TRUE)
 ```
