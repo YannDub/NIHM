@@ -81,8 +81,8 @@ barplot2(times, names.arg = techniques, plot.ci = TRUE, ci.l = lower, ci.u = upp
 ## ANOVA
 
 ```{r}
-library("reshape")
-library("ez")
+#library("reshape")
+#library("ez")
 
 # Chargement des donnees
 data = read.table("data.txt", header=TRUE, sep=",")
@@ -101,22 +101,22 @@ detach(filteredData)
 colnames(aggdata) = c("Participant","Block","Technique","W", "density", "Time")
 
 # Conversion des donnees au format long
-data.long = melt(aggdata, id = c("Participant","Block","Technique","W","density","Time"))
+#data.long = melt(aggdata, id = c("Participant","Block","Technique","W","density","Time"))
 
 # On specifie les variables independantes
-data.long$Block = factor(data.long$Block)
-data.long$Technique = factor(data.long$Technique)
-data.long$W = factor(data.long$W)
-data.long$density = factor(data.long$density)
+#data.long$Block = factor(data.long$Block)
+#data.long$Technique = factor(data.long$Technique)
+#data.long$W = factor(data.long$W)
+#data.long$density = factor(data.long$density)
 
 # L’ANOVA:
-print(ezANOVA(data.long, dv=.(Time), wid=.(Participant), within=.(Technique,W,density)))
+#print(ezANOVA(data.long, dv=.(Time), wid=.(Participant), within=.(Technique,W,density)))
 
 # Analyse post-hoc avec ajustement de Bonferroni
-attach(data.long)
-print(pairwise.t.test(Time, interaction(Technique), p.adj = "bonf"))
-print(pairwise.t.test(Time, interaction(Technique, density), p.adj = "bonf"))
-detach(data.long)
+#attach(data.long)
+#print(pairwise.t.test(Time, interaction(Technique), p.adj = "bonf"))
+#print(pairwise.t.test(Time, interaction(Technique, density), p.adj = "bonf"))
+#detach(data.long)
 ```
 
 ### Q9
@@ -127,11 +127,11 @@ Non, m'effet significatif technique ne permet de conclure que Surfpad est meille
 
 ```{r}
 meanTimeDensity = function(frame, densities, techniques) {
-  newData = subset(frame, density=density)
+  newData = subset(frame, density==densities)
   sapply(techniques, meanTime, frame=newData)
 }
 
 densities = unique(filteredData$density)
 res = sapply(densities, meanTimeDensity, frame=filteredData, techniques=techniques)
-barplot2(res, names.arg = densities, beside=TRUE)
+barplot2(res, names.arg = densities, beside=TRUE, legend=techniques, ylab="temps", xlab="densite")
 ```
