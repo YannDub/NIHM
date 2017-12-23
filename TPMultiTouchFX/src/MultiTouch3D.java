@@ -133,12 +133,27 @@ public class MultiTouch3D extends Application{
 			Point2D cursor = new Point2D(p.getX(), p.getY());
 			
 			if (res.getIntersectedNode() != null && res.getIntersectedNode().getId() != null) {	
-				Point2D diff = cursor.subtract(previousPoint);
-				System.out.println(diff);
-				
-				box.setTranslateX(box.getTranslateX() + diff.getX());
-				box.setTranslateY(box.getTranslateY() + diff.getY());
-				previousPoint = cursor;
+				if(nbCursorInObject == 1) {
+					Point2D diff = cursor.subtract(previousPoint);
+					System.out.println(diff);
+					
+					box.setTranslateX(box.getTranslateX() + diff.getX());
+					box.setTranslateY(box.getTranslateY() + diff.getY());
+					previousPoint = cursor;
+				}
+				if(nbCursorInObject == 2) {
+					Quaternion q = new Quaternion(box.getRotationAxis(), Math.toRadians(box.getRotate()));
+					Point2D diff = cursor.subtract(previousPoint);
+					
+					double angle = Math.atan(diff.magnitude() / (box.getWidth() / 2));
+					
+					Quaternion q2 = new Quaternion(new Point3D(-diff.getY(), diff.getX(), 0), -angle);
+					
+					Quaternion qRes = q2.multiply(q);
+					box.setRotationAxis(qRes.getAxis());
+					box.setRotate(Math.toDegrees(qRes.getAngle()));
+					previousPoint = cursor;
+				}
 			}
 			
 			if(nbCursorInObject > 0 && res.getIntersectedNode() == null) {
